@@ -85,6 +85,7 @@ const accounts = [];
           await startNegotiationsBtn.dispose();
           console.log(`✅ Переговори для ${account.username} розпочато`);
           const talkSelector = 'a[href^="../../boss/wicket"]';
+          // href="boss/wicket:interface/:10:action:actionLink::ILinkListener::"
 
           const talkWithInvestors = async () => {
             while (true) {
@@ -121,10 +122,36 @@ const accounts = [];
         }
       };
 
+      const runToFirstVIP = async () => {
+        // const liftLink = await page.waitForSelector(`a[href="lift"]`);
+        await page.locator(`a[href="lift"]`).click();
+
+        while (true) {
+          try {
+            const liftSelector = await page.waitForSelector(
+              `.lift a.tdu[href]`
+            );
+            const vipSelector = await page.$(".lift .vip");
+            if (vipSelector) {
+              console.log(`✅ VIP для ${account.username} знайдений`);
+              break;
+            } else {
+              await liftSelector.click();
+              await liftSelector.dispose();
+            }
+          } catch (error) {
+            console.log(`✅ Всі відвідувачі для ${account.username} розвезені`);
+            break;
+          }
+        }
+      };
+
       while (true) {
         try {
-          await attendNegotiations();
+          // await attendNegotiations();
           await runManager();
+          // setInterval(runToFirstVIP, 4 * 60 * 60 * 1000);
+          await runToFirstVIP();
 
           await new Promise((resolve) => setTimeout(resolve, 30000)); // Чекаємо 30 секунд
           await page.reload();
@@ -137,7 +164,7 @@ const accounts = [];
             }, ${new Date().toISOString()}`,
             error
           );
-          break;
+          continue;
         }
       }
     })
