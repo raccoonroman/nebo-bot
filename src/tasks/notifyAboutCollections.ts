@@ -9,7 +9,14 @@ const playSound = () => {
   exec('powershell -c "(New-Object Media.SoundPlayer \\"notify.wav\\").PlaySync()"');
 };
 
-export const notifyAboutCollections = async (page: Page, username: string) => {
+export const notifyAboutCollections = async (
+  page: Page,
+  username: string,
+  accountType?: string,
+) => {
+  if (accountType !== 'personal') {
+    return;
+  }
   if (
     !isMonday(moscowTime) &&
     !isTuesday(moscowTime) &&
@@ -20,10 +27,10 @@ export const notifyAboutCollections = async (page: Page, username: string) => {
   }
 
   try {
-    await page.waitForSelector(`a[href="city/coll"]`);
+    await page.waitForSelector(`a.cntr[href="city/coll"]`);
     console.log(`🔔 Колекції для ${username} доступні`);
     playSound();
-  } catch (error) {
+  } catch {
     console.log(`❌ Немає поки колекцій для ${username}`);
   } finally {
     await goHome(page, username);

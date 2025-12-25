@@ -29,13 +29,13 @@ export const runManager = async (page: Page, username: string) => {
             const allLinks = await page.$$(buySelector);
             await allLinks.at(-1)?.click();
           }
-        } catch (error) {
+        } catch {
           console.log(`✅ Завдання для ${username} '${taskAction}' виконано`);
           await goHome(page, username);
           break;
         }
       }
-    } catch (error) {
+    } catch {
       console.log(`⌛ поки немає ні одного завдання в ${username}`);
       await goHome(page, username);
       return;

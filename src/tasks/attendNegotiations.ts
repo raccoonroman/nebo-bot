@@ -20,11 +20,11 @@ export const attendNegotiations = async (page: Page, username: string) => {
       while (true) {
         try {
           const taksButton = await page.waitForSelector(talkSelector, { timeout: 2000 });
-          console.log('🔁 Відповідаємо інвесторам...');
+          console.log(`🔁 Відповідаємо інвесторам, ${username}`);
           await taksButton?.click();
           // await taksButton.dispose();
           await new Promise((resolve) => setTimeout(resolve, 6000));
-        } catch (error) {
+        } catch {
           console.log('✅ Переговори закінчились');
           break;
         }
@@ -34,16 +34,16 @@ export const attendNegotiations = async (page: Page, username: string) => {
     while (true) {
       try {
         await page.waitForSelector(talkSelector, { timeout: 2000 });
-        console.log('🎯 Розмовляємо з інвесторами...');
+        console.log(`🎯 Розмовляємо з інвесторами, ${username}`);
         await talkWithInvestors();
         return;
-      } catch (error) {
+      } catch {
         console.log('❌ Кнопки ще нема. Перезавантажуємо сторінку...');
         await new Promise((resolve) => setTimeout(resolve, 10000));
         await page.reload();
       }
     }
-  } catch (error) {
+  } catch {
     console.log(`❎ Переговорів поки немає для ${username}`);
     return;
   }
