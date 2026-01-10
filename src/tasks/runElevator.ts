@@ -17,30 +17,30 @@ export const runElevator = async (
     stopOnVIP: boolean;
     passBuyerVIP?: boolean;
     evictWeakResidents?: boolean;
+    evictWeakResidentsCb?: () => Promise<void>;
   },
 ) => {
+  await goHome(page, username);
   const isHotelAvailable = await checkIsHotelAvailable(page);
-  const liftSelector = 'a.tdn[href="lift"]';
-  const visitorsAmountHandler = (el: HTMLSpanElement) => el.textContent.trim();
-  const noVisitorsSelector = await page.$(`${liftSelector} img[src$="/tb_lift2.png"]`);
-  const visitorsAmountSelector = await page.$(`${liftSelector} .amount span`);
+  const liftHomePageSelector = 'a.tdn[href="lift"]';
+  const noVisitorsSelector = await page.$(`${liftHomePageSelector} img[src$="/tb_lift2.png"]`);
+  const visitorsAmount = await page
+    .$eval(`${liftHomePageSelector} .amount span`, (el) => Number(el.textContent?.trim()))
+    .catch(() => null);
 
   if (noVisitorsSelector) {
-    console.log(`❌ Відвідувачів немає для ${username}`);
+    console.log(`❌ Всі відвідувачі вже розвезені для ${username}`);
     return;
   }
-  if (
-    visitorsAmountSelector &&
-    Number(await page.evaluate(visitorsAmountHandler, visitorsAmountSelector)) <= 15
-  ) {
-    console.log(`⌛ Трохи почекаємо, коли відвідувачів буде більше 15 для ${username}`);
+  if (visitorsAmount && visitorsAmount <= 10) {
+    console.log(`⌛ Трохи почекаємо, коли відвідувачів буде більше 10 для ${username}`);
     return;
   }
-  await page.locator(liftSelector).click();
+  await page.locator(liftHomePageSelector).click();
 
   while (true) {
     try {
-      const liftSelector = await page.waitForSelector(`.lift a.tdu[href]`);
+      await page.locator('.footer').wait();
       const vipSelector = await page.$('.lift .vip');
       const isBuyer = await page.$('.lift .ctrl img:first-child[src*="st_sell"]');
       const floorSelector = await page.$('.lift a.tdu span');
@@ -61,9 +61,8 @@ export const runElevator = async (
             await goHome(page, username);
             break;
           }
-          await liftSelector?.click();
-          await liftSelector?.dispose();
-          await page.locator(`.lift a.tdu[href]`).click();
+          await page.locator('.lift a.tdu[href]').click();
+          await page.locator('.lift a.tdu[href]').click();
           await page.locator('.notify a').click();
           await page.locator('.stat:nth-child(4) strong').wait();
           const resirentLevel = await page.$eval('.stat:nth-child(4) strong', (el) =>
@@ -72,13 +71,18 @@ export const runElevator = async (
           if (resirentLevel < 9) {
             await page.locator('a.btnr').click();
             console.log(`🚪 Виселяємо жителя з рівнем ${resirentLevel}`);
+            await options.evictWeakResidentsCb?.();
           }
+          await goHome(page, username);
+          await page.locator(liftHomePageSelector).click();
+          console.log(`🔄 Повертаємося до ліфта`);
+          continue;
+        } else {
+          await goHome(page, username);
+          break;
         }
-        await goHome(page, username);
-        break;
       }
-      await liftSelector?.click();
-      await liftSelector?.dispose();
+      await page.locator('.lift a.tdu[href]').click();
     } catch {
       console.log(`✅ Всі відвідувачі для ${username} розвезені`);
       await goHome(page, username);

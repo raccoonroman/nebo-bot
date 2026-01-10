@@ -1,13 +1,9 @@
-import { exec } from 'child_process';
 import type { Page } from 'puppeteer';
 import { isFriday, isMonday, isThursday, isTuesday } from 'date-fns';
 
 import { moscowTime } from '../const';
 import { goHome } from './goHome';
-
-const playSound = () => {
-  exec('powershell -c "(New-Object Media.SoundPlayer \\"notify.wav\\").PlaySync()"');
-};
+import { playSound } from './utils';
 
 export const notifyAboutCollections = async (
   page: Page,
@@ -28,10 +24,10 @@ export const notifyAboutCollections = async (
 
   try {
     await page.waitForSelector(`a.cntr[href="city/coll"]`);
-    console.log(`🔔 Колекції для ${username} доступні`);
+    console.log(`🔔 Колекції доступні`);
     playSound();
   } catch {
-    console.log(`❌ Немає поки колекцій для ${username}`);
+    console.log(`❌ Немає поки колекцій`);
   } finally {
     await goHome(page, username);
     return;
