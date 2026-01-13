@@ -17,7 +17,6 @@ export const runElevator = async (
     stopOnVIP: boolean;
     passBuyerVIP?: boolean;
     evictWeakResidents?: boolean;
-    evictWeakResidentsCb?: () => Promise<void>;
   },
 ) => {
   await goHome(page, username);
@@ -71,7 +70,6 @@ export const runElevator = async (
           if (resirentLevel < 9) {
             await page.locator('a.btnr').click();
             console.log(`🚪 Виселяємо жителя з рівнем ${resirentLevel}`);
-            await options.evictWeakResidentsCb?.();
           }
           await goHome(page, username);
           await page.locator(liftHomePageSelector).click();

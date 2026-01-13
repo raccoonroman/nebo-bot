@@ -24,29 +24,26 @@ export const bringNewResidents = async (page: Page, username: string) => {
   if (doneAmount === RESIDENTS_AMOUNT_FOR_TASK) {
     console.log(`✅ Завдання "Привезти нових жителів" вже виконано!`);
     playSound();
+    await goHome(page, username);
     return;
   }
 
-  let needToBringAmount = RESIDENTS_AMOUNT_FOR_TASK - doneAmount;
+  const needToBringAmount = RESIDENTS_AMOUNT_FOR_TASK - doneAmount;
+  console.log(`👷‍♂️ Потрібно привезти ще ${needToBringAmount} жителів`);
+  await runElevator(page, username, {
+    stopOnCitizen: true,
+    stopOnVIP: false,
+    evictWeakResidents: true,
+  });
+  await page.locator('a.tdn[href="lift"]').click();
 
-  while (needToBringAmount > 0) {
-    console.log(`👷‍♂️ Потрібно привезти ще ${needToBringAmount} жителів`);
-    await runElevator(page, username, {
-      stopOnCitizen: true,
-      stopOnVIP: false,
-      evictWeakResidents: true,
-      evictWeakResidentsCb: async () => {
-        needToBringAmount -= 1;
-      },
-    });
-    try {
-      await page.locator('a.tdn[href="lift"]').click();
-      await page.locator('a[href*="activateLiftLink"]').click();
-      console.log(`🔄 Кличемо нових відвідувачів`);
-    } catch {
-      console.log(`❌ Не вдалося запросити нових відвідувачів`);
-    } finally {
-      await goHome(page, username);
-    }
+  try {
+    await page.locator('a[href*="activateLiftLink"]').click();
+    console.log(`🔄 Кличемо нових відвідувачів`);
+  } catch {
+    console.log(`❌ Не вдалося запросити нових відвідувачів`);
+  } finally {
+    await goHome(page, username);
+    return;
   }
 };
