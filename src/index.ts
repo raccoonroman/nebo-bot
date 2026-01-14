@@ -2,19 +2,20 @@ import puppeteer from 'puppeteer';
 
 import { accounts } from './accounts';
 import {
-  goHome,
   attendNegotiations,
+  bringNewResidents,
+  goHome,
   notifyAboutCollections,
+  produceToys,
   runElevator,
   runManager,
-  produceToys,
 } from './tasks';
 
 accounts.map(async (account) => {
   const { username, password } = account;
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
-  page.setDefaultTimeout(5000);
+  page.setDefaultTimeout(6000);
 
   await page.goto('https://nebo.mobi', { waitUntil: 'domcontentloaded' });
   await page.locator('a ::-p-text(Вход)').click();
@@ -25,23 +26,27 @@ accounts.map(async (account) => {
 
   while (true) {
     try {
-      await produceToys(page, username);
+      // await produceToys(page, username);
       await runManager(page, username);
-      await attendNegotiations(page, username);
-      await runElevator(page, username, {
-        stopOnCitizen: true,
-        stopOnVIP: false,
-        passBuyerVIP: true,
-        evictWeakResidents: true,
-      });
-      await notifyAboutCollections(page, username, account.type);
+      // await bringNewResidents(page, username);
+      // await attendNegotiations(page, username);
+      // await runElevator(page, username, {
+      //   stopOnCitizen: true,
+      //   stopOnVIP: true,
+      //   passBuyerVIP: true,
+      //   evictWeakResidents: true,
+      // });
+      // await notifyAboutCollections(page, username, account.type);
 
       await new Promise((resolve) => setTimeout(resolve, 30000));
       await page.reload();
       console.log(`🔃 Перезавантажено сторінку`);
-      await goHome(page, username);
     } catch (error) {
-      console.error(`❌ Помилка в юзера ${username}, ${new Date().toISOString()}`, error);
+      console.error(
+        `❌ Помилка в юзера ${username}, ${new Date().toISOString()}`,
+        error
+      );
+    } finally {
       await goHome(page, username);
     }
   }

@@ -1,14 +1,14 @@
-import type { Page } from 'puppeteer';
 import { isFriday, isMonday, isThursday, isTuesday } from 'date-fns';
+import type { Page } from 'puppeteer';
 
 import { moscowTime } from '../const';
+import { playSound } from '../utils';
 import { goHome } from './goHome';
-import { playSound } from './utils';
 
 export const notifyAboutCollections = async (
   page: Page,
   username: string,
-  accountType?: string,
+  accountType?: string
 ) => {
   if (accountType !== 'personal') {
     return;
@@ -30,6 +30,5 @@ export const notifyAboutCollections = async (
     console.log(`❌ Немає поки колекцій`);
   } finally {
     await goHome(page, username);
-    return;
   }
 };

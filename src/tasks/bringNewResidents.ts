@@ -1,7 +1,7 @@
 import type { Page } from 'puppeteer';
 import { goHome } from './goHome';
 import { runElevator } from './runElevator';
-import { playSound } from './utils';
+import { playSound } from '../utils';
 
 const TASK_TITLE = 'Новые жители';
 const RESIDENTS_AMOUNT_FOR_TASK = 25;
@@ -14,11 +14,14 @@ export const bringNewResidents = async (page: Page, username: string) => {
   const doneAmount = await page.$eval(
     `::-p-text(${TASK_TITLE})`,
     (node, defaultAmount) => {
+      // biome-ignore lint/style/noNonNullAssertion: node is guaranteed to have a parent with class 'nfl'
       const taskBlock = node.closest('.nfl')!;
-      const done = taskBlock.querySelector('.minor.small.nshd:not(.m5) > span span:first-child');
+      const done = taskBlock.querySelector(
+        '.minor.small.nshd:not(.m5) > span span:first-child'
+      );
       return done ? Number(done.textContent) : defaultAmount;
     },
-    RESIDENTS_AMOUNT_FOR_TASK,
+    RESIDENTS_AMOUNT_FOR_TASK
   );
   await goHome(page, username);
   if (doneAmount === RESIDENTS_AMOUNT_FOR_TASK) {
@@ -44,6 +47,5 @@ export const bringNewResidents = async (page: Page, username: string) => {
     console.log(`❌ Не вдалося запросити нових відвідувачів`);
   } finally {
     await goHome(page, username);
-    return;
   }
 };
