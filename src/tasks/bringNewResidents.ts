@@ -16,12 +16,10 @@ export const bringNewResidents = async (page: Page, username: string) => {
     (node, defaultAmount) => {
       // biome-ignore lint/style/noNonNullAssertion: node is guaranteed to have a parent with class 'nfl'
       const taskBlock = node.closest('.nfl')!;
-      const done = taskBlock.querySelector(
-        '.minor.small.nshd:not(.m5) > span span:first-child'
-      );
+      const done = taskBlock.querySelector('.minor.small.nshd:not(.m5) > span span:first-child');
       return done ? Number(done.textContent) : defaultAmount;
     },
-    RESIDENTS_AMOUNT_FOR_TASK
+    RESIDENTS_AMOUNT_FOR_TASK,
   );
   await goHome(page, username);
   if (doneAmount === RESIDENTS_AMOUNT_FOR_TASK) {

@@ -14,9 +14,7 @@ export const produceToys = async (page: Page, username: string) => {
       await page.locator(fabricSelector).click();
       await page.locator(`a::-p-text(Забрать все)`).click();
       await page.locator(`a::-p-text(Запустить все)`).click();
-      console.log(
-        `✅ Всі іграшки для ${username} вироблені, ${new Date().toISOString()}`
-      );
+      console.log(`✅ Всі іграшки для ${username} вироблені, ${new Date().toISOString()}`);
     } catch {
       console.error(`❌ Помилка при виробництві іграшок для ${username}`);
     } finally {

@@ -42,10 +42,7 @@ accounts.map(async (account) => {
       await page.reload();
       console.log(`🔃 Перезавантажено сторінку`);
     } catch (error) {
-      console.error(
-        `❌ Помилка в юзера ${username}, ${new Date().toISOString()}`,
-        error
-      );
+      console.error(`❌ Помилка в юзера ${username}, ${new Date().toISOString()}`, error);
     } finally {
       await goHome(page, username);
     }

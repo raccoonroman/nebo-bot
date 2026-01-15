@@ -1,5 +1,5 @@
-import type { Page } from 'puppeteer';
 import { isWednesday, isWeekend } from 'date-fns';
+import type { Page } from 'puppeteer';
 
 import { moscowTime } from '../const';
 

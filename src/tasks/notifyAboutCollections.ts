@@ -8,7 +8,7 @@ import { goHome } from './goHome';
 export const notifyAboutCollections = async (
   page: Page,
   username: string,
-  accountType?: string
+  accountType?: string,
 ) => {
   if (accountType !== 'personal') {
     return;
