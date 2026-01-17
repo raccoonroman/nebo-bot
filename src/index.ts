@@ -13,9 +13,9 @@ import {
 
 accounts.map(async (account) => {
   const { username, password } = account;
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
-  page.setDefaultTimeout(6000);
+  page.setDefaultTimeout(3000);
 
   await page.goto('https://nebo.mobi', { waitUntil: 'domcontentloaded' });
   await page.locator('a ::-p-text(Вход)').click();
@@ -30,15 +30,15 @@ accounts.map(async (account) => {
       await runManager(page, username);
       // await bringNewResidents(page, username);
       // await attendNegotiations(page, username);
-      // await runElevator(page, username, {
-      //   stopOnCitizen: true,
-      //   stopOnVIP: true,
-      //   passBuyerVIP: true,
-      //   evictWeakResidents: true,
-      // });
+      await runElevator(page, username, {
+        stopOnCitizen: true,
+        stopOnVIP: true,
+        passBuyerVIP: true,
+        evictWeakResidents: true,
+      });
       // await notifyAboutCollections(page, username, account.type);
 
-      await new Promise((resolve) => setTimeout(resolve, 30000));
+      await new Promise((resolve) => setTimeout(resolve, 10000));
       await page.reload();
       console.log(`🔃 Перезавантажено сторінку`);
     } catch (error) {
