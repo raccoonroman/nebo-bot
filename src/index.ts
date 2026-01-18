@@ -1,9 +1,9 @@
-import puppeteer from 'puppeteer';
+import { chromium } from 'playwright';
 
 import { accounts } from './accounts';
 import {
   attendNegotiations,
-  bringNewResidents,
+  bring25Residents,
   goHome,
   notifyAboutCollections,
   produceToys,
@@ -13,38 +13,31 @@ import {
 
 accounts.map(async (account) => {
   const { username, password } = account;
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await chromium.launch({ headless: false });
   const page = await browser.newPage();
-  page.setDefaultTimeout(3000);
-
-  await page.goto('https://nebo.mobi', { waitUntil: 'domcontentloaded' });
-  await page.locator('a ::-p-text(Вход)').click();
+  await page.goto('https://nebo.mobi');
+  await page.getByRole('link', { name: 'Вход' }).click();
   await page.locator('input[name="login"]').fill(username);
   await page.locator('input[name="password"]').fill(password);
-  await page.locator('input[value="Вход"]').click();
+  await page.getByRole('button', { name: 'Вход' }).click();
   await goHome(page, username);
 
   while (true) {
-    try {
-      // await produceToys(page, username);
-      await runManager(page, username);
-      // await bringNewResidents(page, username);
-      // await attendNegotiations(page, username);
-      await runElevator(page, username, {
-        stopOnCitizen: true,
-        stopOnVIP: true,
-        passBuyerVIP: true,
-        evictWeakResidents: true,
-      });
-      // await notifyAboutCollections(page, username, account.type);
+    // await produceToys(page, username);
+    await runManager(page, username);
+    await bring25Residents(page, username);
+    // await attendNegotiations(page, username);
+    // await runElevator(page, username, {
+    //   stopOnCitizen: true,
+    //   stopOnVIP: false,
+    //   passBuyerVIP: true,
+    //   evictWeakResidents: true,
+    // });
+    // await notifyAboutCollections(page, username, account.type);
 
-      await new Promise((resolve) => setTimeout(resolve, 10000));
-      await page.reload();
-      console.log(`🔃 Перезавантажено сторінку`);
-    } catch (error) {
-      console.error(`❌ Помилка в юзера ${username}, ${new Date().toISOString()}`, error);
-    } finally {
-      await goHome(page, username);
-    }
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+    await page.reload();
+    console.log(`🔃 Перезавантажено сторінку`);
+    await goHome(page, username);
   }
 });

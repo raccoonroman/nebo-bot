@@ -1,7 +1,7 @@
-export { goHome } from './goHome';
-export { runManager } from './runManager';
-export { runElevator } from './runElevator';
-export { notifyAboutCollections } from './notifyAboutCollections';
 export { attendNegotiations } from './attendNegotiations';
+export { bring25Residents } from './bring25Residents';
+export { goHome } from './goHome';
+export { notifyAboutCollections } from './notifyAboutCollections';
 export { produceToys } from './produceToys';
-export { bringNewResidents } from './bringNewResidents';
+export { runElevator } from './runElevator';
+export { runManager } from './runManager';

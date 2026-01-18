@@ -1,44 +1,36 @@
-import type { Page } from 'puppeteer';
+import type { Page } from 'playwright';
 import { goHome } from './goHome';
 
 export const runManager = async (page: Page, username: string) => {
   while (true) {
-    try {
-      const linkToAllFloorsSelector = 'a.tdn[href*="floors/"]';
-      const linkToAllFloors = await page.waitForSelector(linkToAllFloorsSelector);
-      const iconSrc = await page.$eval(`${linkToAllFloorsSelector} img`, (img) =>
-        img.getAttribute('src'),
-      );
+    const linkToAllFloors = page.locator('.tlbr a.tdn[href*="floors/"]');
+    if (await linkToAllFloors.isVisible()) {
+      const iconSrc = await linkToAllFloors.locator('img').getAttribute('src');
       const taskAction = iconSrc?.includes('sold')
         ? 'Собрать выручку!'
         : iconSrc?.includes('stocked')
           ? 'Выложить товар'
           : 'Закупить товар';
-      await linkToAllFloors?.click();
-      await linkToAllFloors?.dispose();
+
+      await linkToAllFloors.click();
 
       while (true) {
-        try {
-          const firstFloorLink = await page.waitForSelector(`a::-p-text(${taskAction})`);
-          await firstFloorLink?.click();
-          await firstFloorLink?.dispose();
-
+        const firstFloorLink = page.getByText(taskAction, { exact: true }).first();
+        if (await firstFloorLink.isVisible()) {
+          await firstFloorLink.click();
           if (taskAction === 'Закупить товар') {
-            const buySelector = 'a.tdu ::-p-text(Закупить за)';
-            await page.waitForSelector(buySelector);
-            const allLinks = await page.$$(buySelector);
-            await allLinks.at(-1)?.click();
+            await page.locator('a.tdu', { hasText: 'Закупить за' }).last().click();
           }
-        } catch {
+        } else {
           console.log(`✅ Завдання для ${username} '${taskAction}' виконано`);
           await goHome(page, username);
           break;
         }
       }
-    } catch {
+    } else {
       console.log(`⌛ поки немає ні одного завдання в ${username}`);
       await goHome(page, username);
-      return;
+      break;
     }
   }
 };
