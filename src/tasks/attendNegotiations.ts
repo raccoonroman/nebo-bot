@@ -1,5 +1,5 @@
 import { isWednesday, isWeekend } from 'date-fns';
-import type { Page } from 'puppeteer';
+import type { Page } from 'playwright';
 
 import { moscowTime } from '../const';
 
@@ -8,43 +8,37 @@ export const attendNegotiations = async (page: Page, username: string) => {
     return;
   }
 
-  try {
-    const startNegotiationsBtn = await page.waitForSelector('a::-p-text(Начать переговоры)', {
-      timeout: 2000,
-    });
-    await startNegotiationsBtn?.click();
-    console.log(`✅ Переговори для ${username} розпочато`);
-    const talkSelector = 'a[href*="boss/wicket"]';
+  const startNegotiationsBtn = page.getByRole('link', { name: 'Начать переговоры' });
+  if (await startNegotiationsBtn.isHidden()) {
+    return;
+  }
+  await startNegotiationsBtn.click();
+  console.log(`✅ Переговори для ${username} розпочато`);
 
-    const talkWithInvestors = async () => {
-      while (true) {
-        try {
-          const taksButton = await page.waitForSelector(talkSelector, { timeout: 2000 });
-          console.log(`🔁 Відповідаємо інвесторам, ${username}`);
-          await taksButton?.click();
-          // await taksButton.dispose();
-          await new Promise((resolve) => setTimeout(resolve, 6000));
-        } catch {
-          console.log('✅ Переговори закінчились');
-          break;
-        }
-      }
-    };
-
+  const talkWithInvestors = async () => {
     while (true) {
-      try {
-        await page.waitForSelector(talkSelector, { timeout: 2000 });
-        console.log(`🎯 Розмовляємо з інвесторами, ${username}`);
-        await talkWithInvestors();
-        return;
-      } catch {
-        console.log('❌ Кнопки ще нема. Перезавантажуємо сторінку...');
-        await new Promise((resolve) => setTimeout(resolve, 10000));
-        await page.reload();
+      const talk = page.locator('a[href*="boss/wicket"]');
+      if (await talk.isVisible()) {
+        await talk.click();
+        console.log(`🔁 Відповідаємо інвесторам, ${username}`);
+        await new Promise((resolve) => setTimeout(resolve, 6000));
+      } else {
+        console.log('✅ Переговори закінчились');
+        break;
       }
     }
-  } catch {
-    console.log(`❎ Переговорів поки немає для ${username}`);
-    return;
+  };
+
+  while (true) {
+    const talk = page.locator('a[href*="boss/wicket"]');
+    if (await talk.isHidden()) {
+      console.log('❌ Кнопки ще нема. Перезавантажуємо сторінку...');
+      await new Promise((resolve) => setTimeout(resolve, 10000));
+      await page.reload();
+    } else {
+      console.log(`🎯 Розмовляємо з інвесторами, ${username}`);
+      await talkWithInvestors();
+      break;
+    }
   }
 };

@@ -1,5 +1,4 @@
-import type { Page } from 'puppeteer';
-
+import type { Page } from 'playwright';
 import { goHome } from './goHome';
 
 export const produceToys = async (page: Page, username: string) => {
