@@ -6,7 +6,7 @@ export const runManager = async (page: Page, username: string) => {
     const linkToAllFloors = page.locator('.tlbr a.tdn[href*="floors/"]');
     if (await linkToAllFloors.isHidden()) {
       console.log(`⌛ поки немає ні одного завдання в ${username}`);
-      await goHome(page, username);
+      await goHome(page);
       return;
     }
     const iconSrc = await linkToAllFloors.locator('img').getAttribute('src');
@@ -27,7 +27,7 @@ export const runManager = async (page: Page, username: string) => {
         }
       } else {
         console.log(`✅ Завдання для ${username} '${taskAction}' виконано`);
-        await goHome(page, username);
+        await goHome(page);
         break;
       }
     }

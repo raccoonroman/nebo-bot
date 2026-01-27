@@ -13,10 +13,11 @@ export const runElevator = async (
   page: Page,
   username: string,
   options: {
+    waitForMinimumVisitors?: number;
     stopOnCitizen: boolean;
-    stopOnVIP: boolean;
-    passBuyerVIP?: boolean;
     evictWeakResidents?: boolean;
+    stopOnVIP?: boolean;
+    passOnlyBuyerVIP?: boolean;
   },
 ) => {
   const liftHomePage = page.locator('a.tdn[href="lift"]');
@@ -25,13 +26,17 @@ export const runElevator = async (
     console.log(`❌ Всі відвідувачі вже розвезені для ${username}`);
     return;
   }
-  const visitorsAmountSelector = liftHomePage.locator('.amount span');
-  if (await visitorsAmountSelector.isVisible()) {
-    const visitorsAmountText = await visitorsAmountSelector.textContent();
-    const visitorsAmount = visitorsAmountText ? Number(visitorsAmountText.trim()) : 0;
-    if (visitorsAmount <= 10) {
-      console.log(`⌛ Трохи почекаємо, коли відвідувачів буде більше 10 для ${username}`);
-      return;
+  if (options.waitForMinimumVisitors) {
+    const visitorsAmountSelector = liftHomePage.locator('.amount span');
+    if (await visitorsAmountSelector.isVisible()) {
+      const visitorsAmountText = await visitorsAmountSelector.textContent();
+      const visitorsAmount = visitorsAmountText ? Number(visitorsAmountText.trim()) : 0;
+      if (visitorsAmount <= options.waitForMinimumVisitors) {
+        console.log(
+          `⌛ Трохи почекаємо поки відвідувачів буде більше ${options.waitForMinimumVisitors} для ${username}`,
+        );
+        return;
+      }
     }
   }
   const isHotelAvailable = await checkIsHotelAvailable(page);
@@ -41,27 +46,34 @@ export const runElevator = async (
     const lift = page.locator('.lift a.tdu[href]');
     if (await lift.isHidden()) {
       console.log(`✅ Всі відвідувачі для ${username} розвезені`);
-      await goHome(page, username);
+      await goHome(page);
       break;
     }
     const vip = page.locator('.lift .vip');
     const buyerIcon = page.locator('.lift .ctrl img:first-child[src*="st_sell"]');
     const floorTextContent = await page.locator('.lift a.tdu span').textContent();
     const floorValue = floorTextContent ? Number(floorTextContent?.trim()) : null;
-    if (options.stopOnVIP && (await vip.isVisible())) {
+    if (await vip.isVisible()) {
       console.log(`✅ VIP для ${username} знайдений`);
-      if (options.passBuyerVIP && (await buyerIcon.isVisible())) {
-        console.log(`➡️ Пропускаємо VIP покупця для ${username}`);
-      } else {
-        await goHome(page, username);
+      if (options.stopOnVIP) {
+        await goHome(page);
         break;
       }
-    } else if (options.stopOnCitizen && floorValue === 1) {
+      if (options.passOnlyBuyerVIP) {
+        if (await buyerIcon.isVisible()) {
+          console.log(`➡️ Пропускаємо VIP покупця для ${username}`);
+        } else {
+          await goHome(page);
+          break;
+        }
+      }
+    }
+    if (options.stopOnCitizen && floorValue === 1) {
       console.log(`✅ Новий житель для ${username} знайдений`);
       if (options.evictWeakResidents) {
         if (!isHotelAvailable) {
           console.log(`🏨 Готель уже переповнений`);
-          await goHome(page, username);
+          await goHome(page);
           break;
         }
         await page.getByRole('link', { name: 'Поднять лифт на 1 этаж' }).click();
@@ -73,12 +85,12 @@ export const runElevator = async (
           await page.getByRole('link', { name: 'Выселить' }).click();
           console.log(`🚪 Виселяємо жителя з рівнем ${resirentLevel}`);
         }
-        await goHome(page, username);
+        await goHome(page);
         await page.locator('a.tdn[href="lift"]').click();
         console.log(`🔄 Повертаємося до ліфта`);
         continue;
       } else {
-        await goHome(page, username);
+        await goHome(page);
         break;
       }
     }
