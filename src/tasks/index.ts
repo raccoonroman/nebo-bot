@@ -1,5 +1,6 @@
 export { attendNegotiations } from './attendNegotiations';
 export { bring25Residents } from './bring25Residents';
+export { findVipTask } from './findVipTask';
 export { goHome } from './goHome';
 export { notifyAboutCollections } from './notifyAboutCollections';
 export { produceToys } from './produceToys';
