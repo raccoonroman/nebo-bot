@@ -22,6 +22,7 @@ accounts.map(async (account) => {
   await page.locator('input[name="password"]').fill(password);
   await page.getByRole('button', { name: 'Вход' }).click();
   await goHome(page);
+  console.log(`✅ Успішний вхід для юзера ${username}`);
 
   while (true) {
     try {

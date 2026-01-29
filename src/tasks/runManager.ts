@@ -26,7 +26,7 @@ export const runManager = async (page: Page, username: string) => {
           await page.locator('a.tdu', { hasText: 'Закупить за' }).last().click();
         }
       } else {
-        console.log(`✅ Завдання для ${username} '${taskAction}' виконано`);
+        console.log(`💲 Завдання для ${username} '${taskAction}' виконано`);
         await goHome(page);
         break;
       }

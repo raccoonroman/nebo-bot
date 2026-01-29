@@ -54,15 +54,14 @@ export const runElevator = async (
     const floorTextContent = await page.locator('.lift a.tdu span').textContent();
     const floorValue = floorTextContent ? Number(floorTextContent?.trim()) : null;
     if (await vip.isVisible()) {
-      console.log(`✅ VIP для ${username} знайдений`);
       if (options.stopOnVIP) {
+        console.log(`✅ VIP для ${username} знайдений`);
         await goHome(page);
         break;
       }
       if (options.passOnlyBuyerVIP) {
-        if (await buyerIcon.isVisible()) {
-          console.log(`➡️ Пропускаємо VIP покупця для ${username}`);
-        } else {
+        if (await buyerIcon.isHidden()) {
+          console.log(`✅ Не VIP-покупець для ${username} знайдений`);
           await goHome(page);
           break;
         }

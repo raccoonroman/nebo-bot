@@ -1,15 +1,10 @@
 import { isFriday, isMonday, isThursday, isTuesday } from 'date-fns';
-import type { Page } from 'puppeteer';
 
+import type { Page } from 'playwright';
 import { moscowTime } from '../const';
 import { playSound } from '../utils';
-import { goHome } from './goHome';
 
-export const notifyAboutCollections = async (
-  page: Page,
-  username: string,
-  accountType?: string,
-) => {
+export const notifyAboutCollections = async (page: Page, accountType?: string) => {
   if (accountType !== 'personal') {
     return;
   }
@@ -22,13 +17,12 @@ export const notifyAboutCollections = async (
     return;
   }
 
-  try {
-    await page.waitForSelector(`a.cntr[href="city/coll"]`);
+  const collections = page.locator('a.cntr[href="city/coll"]');
+
+  if (await collections.isVisible()) {
     console.log(`🔔 Колекції доступні`);
     playSound();
-  } catch {
+  } else {
     console.log(`❌ Немає поки колекцій`);
-  } finally {
-    await goHome(page, username);
   }
 };
