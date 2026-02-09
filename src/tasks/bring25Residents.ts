@@ -38,7 +38,8 @@ export const bring25Residents = async (page: Page, username: string) => {
   }
   await runElevator(page, username, {
     stopOnCitizen: true,
-    stopOnVIP: false,
     evictWeakResidents: true,
+    // stopOnVIP: false,
+    // passOnlyBuyerVIP: true,
   });
 };
