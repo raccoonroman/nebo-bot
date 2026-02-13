@@ -57,7 +57,6 @@ export const findVipTask = async (page: Page, username: string, taskNames: reado
     await goHome(page);
   }
   await runElevator(page, username, {
-    stopOnCitizen: true,
     evictWeakResidents: true,
     stopOnVIP: true,
   });

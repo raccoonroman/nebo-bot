@@ -11,6 +11,7 @@ export const attendNegotiations = async (page: Page, username: string) => {
 
   const startNegotiationsBtn = page.getByRole('link', { name: 'Начать переговоры' });
   if (await startNegotiationsBtn.isHidden()) {
+    console.log('❌ Переговорів поки немає');
     return;
   }
   await startNegotiationsBtn.click();

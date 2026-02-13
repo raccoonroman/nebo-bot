@@ -1,7 +1,7 @@
 import type { Page } from 'playwright';
 import { goHome } from './goHome';
 
-const checkIsHotelAvailable = async (page: Page) => {
+const isHotelAvailable = async (page: Page) => {
   const freeRoomsText = await page
     .locator('.tower > div > .rs .rs.small > span:last-of-type')
     .textContent();
@@ -9,12 +9,37 @@ const checkIsHotelAvailable = async (page: Page) => {
   return freeRooms > 0;
 };
 
+const ensureHotelHasFreePlace = async (page: Page) => {
+  await goHome(page);
+  if (await isHotelAvailable(page)) {
+    return true;
+  }
+  await page.getByRole('link', { name: 'Гостиница' }).click();
+  const weakResident = page
+    .locator('.rsdst')
+    .filter({ hasNot: page.locator('.abstr').getByText('9') })
+    .first();
+  if (await weakResident.isVisible()) {
+    const residentLevelTextContent = await weakResident.locator('.abstr').textContent();
+    const residentLevel = Number(residentLevelTextContent?.trim());
+    await weakResident.getByRole('link').click();
+    await page.getByRole('link', { name: 'Выселить' }).click();
+    console.log(`🚪 Виселяємо з готелю жителя рівня ${residentLevel}`);
+    await goHome(page);
+    return true;
+  } else {
+    console.log(`🏨 Немає місця в готелі і немає кого виселити`);
+    await goHome(page);
+    return false;
+  }
+};
+
 export const runElevator = async (
   page: Page,
   username: string,
   options: {
     waitForMinimumVisitors?: number;
-    stopOnCitizen: boolean;
+    stopOnCitizen?: boolean;
     evictWeakResidents?: boolean;
     stopOnVIP?: boolean;
     passOnlyBuyerVIP?: boolean;
@@ -39,7 +64,6 @@ export const runElevator = async (
       }
     }
   }
-  const isHotelAvailable = await checkIsHotelAvailable(page);
   await liftHomePage.click();
 
   while (true) {
@@ -67,12 +91,17 @@ export const runElevator = async (
         }
       }
     }
-    if (options.stopOnCitizen && floorValue === 1) {
+    if (floorValue === 1) {
       console.log(`✅ Новий житель для ${username} знайдений`);
+      if (options.stopOnCitizen) {
+        await goHome(page);
+        break;
+      }
       if (options.evictWeakResidents) {
-        if (!isHotelAvailable) {
-          console.log(`🏨 Готель уже переповнений`);
-          await goHome(page);
+        const isHotelAvailable = await ensureHotelHasFreePlace(page);
+        if (isHotelAvailable) {
+          await page.locator('a.tdn[href="lift"]').click();
+        } else {
           break;
         }
         await page.getByRole('link', { name: 'Поднять лифт на 1 этаж' }).click();
@@ -82,15 +111,12 @@ export const runElevator = async (
         const resirentLevel = Number(resirentLevelText?.trim());
         if (resirentLevel < 9) {
           await page.getByRole('link', { name: 'Выселить' }).click();
-          console.log(`🚪 Виселяємо жителя з рівнем ${resirentLevel}`);
+          console.log(`🚪 Виселяємо жителя рівня ${resirentLevel}`);
         }
         await goHome(page);
         await page.locator('a.tdn[href="lift"]').click();
         console.log(`🔄 Повертаємося до ліфта`);
         continue;
-      } else {
-        await goHome(page);
-        break;
       }
     }
     await lift.click();

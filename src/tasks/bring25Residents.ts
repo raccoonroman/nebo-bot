@@ -37,7 +37,6 @@ export const bring25Residents = async (page: Page, username: string) => {
     await goHome(page);
   }
   await runElevator(page, username, {
-    stopOnCitizen: true,
     evictWeakResidents: true,
     // stopOnVIP: false,
     // passOnlyBuyerVIP: true,
