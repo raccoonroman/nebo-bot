@@ -1,38 +1,6 @@
 import type { Page } from 'playwright';
+import { ensureHotelHasFreePlace } from './ensureHotelHasFreePlace';
 import { goHome } from './goHome';
-
-const isHotelAvailable = async (page: Page) => {
-  const freeRoomsText = await page
-    .locator('.tower > div > .rs .rs.small > span:last-of-type')
-    .textContent();
-  const freeRooms = Number(freeRoomsText?.trim());
-  return freeRooms > 0;
-};
-
-const ensureHotelHasFreePlace = async (page: Page) => {
-  await goHome(page);
-  if (await isHotelAvailable(page)) {
-    return true;
-  }
-  await page.getByRole('link', { name: 'Гостиница' }).click();
-  const weakResident = page
-    .locator('.rsdst')
-    .filter({ hasNot: page.locator('.abstr').getByText('9') })
-    .first();
-  if (await weakResident.isVisible()) {
-    const residentLevelTextContent = await weakResident.locator('.abstr').textContent();
-    const residentLevel = Number(residentLevelTextContent?.trim());
-    await weakResident.getByRole('link').click();
-    await page.getByRole('link', { name: 'Выселить' }).click();
-    console.log(`🚪 Виселяємо з готелю жителя рівня ${residentLevel}`);
-    await goHome(page);
-    return true;
-  } else {
-    console.log(`🏨 Немає місця в готелі і немає кого виселити`);
-    await goHome(page);
-    return false;
-  }
-};
 
 export const runElevator = async (
   page: Page,

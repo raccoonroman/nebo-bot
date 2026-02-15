@@ -2,7 +2,7 @@ import type { Page } from 'playwright';
 import { goHome } from './goHome';
 
 export const produceToys = async (page: Page, username: string) => {
-  await goHome(page, username);
+  await goHome(page);
   const fabricSelector = 'a[href="fabric"]';
   const hasReadyToys = await page.$eval(fabricSelector, (link) => {
     const div = link.querySelector('div.cntr.nshd');
@@ -17,7 +17,7 @@ export const produceToys = async (page: Page, username: string) => {
     } catch {
       console.error(`❌ Помилка при виробництві іграшок для ${username}`);
     } finally {
-      await goHome(page, username);
+      await goHome(page);
     }
   }
 };
