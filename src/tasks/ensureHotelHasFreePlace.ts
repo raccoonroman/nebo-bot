@@ -1,4 +1,5 @@
 import type { Page } from 'playwright';
+import { playSound } from '../utils';
 import { goHome } from './goHome';
 
 const isHotelAvailable = async (page: Page) => {
@@ -34,6 +35,7 @@ export const ensureHotelHasFreePlace = async (page: Page) => {
     return true;
   } else {
     console.log(`🏨 Немає місця в готелі і немає кого виселити`);
+    playSound();
     await goHome(page);
     return false;
   }
