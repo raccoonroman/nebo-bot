@@ -1,13 +1,15 @@
 import { isFriday, isMonday, isThursday, isTuesday } from 'date-fns';
 
 import type { Page } from 'playwright';
-import { moscowTime } from '../const';
+import { getMoscowTime } from '../const';
 import { playSound } from '../utils';
 
 export const notifyAboutCollections = async (page: Page, accountType?: string) => {
   if (accountType !== 'personal') {
     return;
   }
+  const moscowTime = getMoscowTime();
+
   if (
     !isMonday(moscowTime) &&
     !isTuesday(moscowTime) &&
