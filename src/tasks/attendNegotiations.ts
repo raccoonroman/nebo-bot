@@ -1,8 +1,7 @@
 import { isWednesday, isWeekend } from 'date-fns';
 import type { Page } from 'playwright';
 
-import { getMoscowTime } from '../const';
-import { waitSeconds } from '../utils';
+import { getMoscowTime, waitSeconds } from '../utils';
 
 export const attendNegotiations = async (page: Page, username: string) => {
   const moscowTime = getMoscowTime();

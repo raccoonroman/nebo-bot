@@ -1,8 +1,7 @@
 import { isFriday, isMonday, isThursday, isTuesday } from 'date-fns';
 
 import type { Page } from 'playwright';
-import { getMoscowTime } from '../const';
-import { playSound } from '../utils';
+import { getMoscowTime, playSound } from '../utils';
 
 export const notifyAboutCollections = async (page: Page, accountType?: string) => {
   if (accountType !== 'personal') {
