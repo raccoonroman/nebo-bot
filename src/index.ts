@@ -37,15 +37,14 @@ const runAccount = async (account: (typeof accounts)[number]) => {
         // await attendNegotiations(page, username);
         // await notifyAboutCollections(page, account.type);
         await runElevator(page, username, {
-          waitForMinimumVisitors: 10,
-          stopOnCitizen: true,
+          waitForMinimumVisitors: 20,
           evictWeakResidents: true,
           stopOnVIP: false,
           passOnlyBuyerVIP: true,
         });
 
-        await waitSeconds(1);
-        console.log(`⏳ Трохи чекаємо`);
+        console.log(`⏳ Трохи чекаємо, ${username}`);
+        await waitSeconds(60);
         await goHome(page);
       }
     } catch (error) {
