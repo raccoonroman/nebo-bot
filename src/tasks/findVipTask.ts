@@ -49,7 +49,7 @@ export const findVipTask = async (page: Page, username: string, taskNames: reado
     await goHome(page);
   }
 
-  const liftHomePage = page.locator('a.tdn[href="lift"]');
+  const liftHomePage = page.locator('a.tdn[href*="lift"]');
   const noVisitorsSelector = liftHomePage.locator('img[src$="/tb_lift2.png"]');
   if (await noVisitorsSelector.isVisible()) {
     await liftHomePage.click();

@@ -13,7 +13,7 @@ export const runElevator = async (
     passOnlyBuyerVIP?: boolean;
   },
 ) => {
-  const liftHomePage = page.locator('a.tdn[href="lift"]');
+  const liftHomePage = page.locator('a.tdn[href*="lift"]');
   const noVisitorsSelector = liftHomePage.locator('img[src$="/tb_lift2.png"]');
   if (await noVisitorsSelector.isVisible()) {
     console.log(`❌ Всі відвідувачі вже розвезені для ${username}`);
@@ -68,7 +68,7 @@ export const runElevator = async (
       if (options.evictWeakResidents) {
         const isHotelAvailable = await ensureHotelHasFreePlace(page);
         if (isHotelAvailable) {
-          await page.locator('a.tdn[href="lift"]').click();
+          await page.locator('a.tdn[href*="lift"]').click();
         } else {
           break;
         }
@@ -82,7 +82,7 @@ export const runElevator = async (
           console.log(`🚪 Виселяємо жителя рівня ${resirentLevel}`);
         }
         await goHome(page);
-        await page.locator('a.tdn[href="lift"]').click();
+        await page.locator('a.tdn[href*="lift"]').click();
         console.log(`🔄 Повертаємося до ліфта`);
         continue;
       }

@@ -18,7 +18,7 @@ export const notifyAboutCollections = async (page: Page, accountType?: string) =
     return;
   }
 
-  const collections = page.locator('a.cntr[href="city/coll"]');
+  const collections = page.locator('a.cntr[href*="collections"]');
 
   if (await collections.isVisible()) {
     console.log(`🔔 Колекції доступні`);

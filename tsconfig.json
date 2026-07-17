@@ -9,6 +9,7 @@
     "module": "ESNext",
     "target": "esnext",
     "types": ["node"],
+    "ignoreDeprecations": "6.0",
     "moduleResolution": "node",
     "lib": ["ES2022"],
     // Other Outputs

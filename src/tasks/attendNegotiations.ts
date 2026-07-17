@@ -20,7 +20,7 @@ export const attendNegotiations = async (page: Page, username: string) => {
 
   const talkWithInvestors = async () => {
     while (true) {
-      const talk = page.locator('a[href*="boss/wicket"]').first();
+      const talk = page.locator('a.btng.btn60[href*="actionLink"]').first();
       if (await talk.isVisible()) {
         await talk.click();
         console.log(`🔁 Відповідаємо інвесторам, ${username}`);
@@ -33,7 +33,7 @@ export const attendNegotiations = async (page: Page, username: string) => {
   };
 
   while (true) {
-    const talk = page.locator('a[href*="boss/wicket"]').first();
+    const talk = page.locator('a.btng.btn60[href*="actionLink"]').first();
     if (await talk.isHidden()) {
       console.log('❌ Кнопки ще нема. Перезавантажуємо сторінку...');
       await waitSeconds(10);
