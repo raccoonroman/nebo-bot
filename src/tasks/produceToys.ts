@@ -2,22 +2,18 @@ import type { Page } from 'playwright';
 import { goHome } from './goHome';
 
 export const produceToys = async (page: Page, username: string) => {
-  await goHome(page);
-  const fabricSelector = 'a[href="fabric"]';
-  const hasReadyToys = await page.$eval(fabricSelector, (link) => {
-    const div = link.querySelector('div.cntr.nshd');
-    return div && div.textContent.trim() === 'Есть готовый инвентарь!';
-  });
+  // треба тут заходити всередину іграшок і перевіряти чи є готові іграшки, якщо є то виробляти їх
+  const fabricLink = page.locator('a[href="fabric"]');
+  const fabricLinkTextContent = await fabricLink.textContent();
+  const hasReadyToys = fabricLinkTextContent?.trim() === 'Есть готовые игрушки!';
   if (hasReadyToys) {
-    try {
-      await page.locator(fabricSelector).click();
-      await page.locator(`a::-p-text(Забрать все)`).click();
-      await page.locator(`a::-p-text(Запустить все)`).click();
-      console.log(`✅ Всі іграшки для ${username} вироблені, ${new Date().toISOString()}`);
-    } catch {
-      console.error(`❌ Помилка при виробництві іграшок для ${username}`);
-    } finally {
-      await goHome(page);
+    await fabricLink.click();
+    const exchangeAllLink = page.getByRole('link', { name: 'Обменять все' });
+    if (await exchangeAllLink.isVisible()) {
+      await exchangeAllLink.click();
     }
+    await page.getByRole('link', { name: 'Запустить все' }).click();
+    console.log(`🧸 Всі іграшки для ${username} вироблені`);
+    await goHome(page);
   }
 };
