@@ -24,7 +24,7 @@ export const ensureHotelHasFreePlace = async (page: Page) => {
     .locator('.rsdst')
     .filter({ has: page.locator('.major').getByText('(-)') })
     .first();
-  const residentToEvict = weakResident.or(sameResident);
+  const residentToEvict = weakResident.or(sameResident).first();
   if (await residentToEvict.isVisible()) {
     const residentLevel = Number((await residentToEvict.locator('.abstr').textContent())?.trim());
     const specialization = (await residentToEvict.locator('.small span').textContent())?.trim();
