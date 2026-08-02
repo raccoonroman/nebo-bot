@@ -1,7 +1,7 @@
 import type { Page } from 'playwright';
 import { playSound } from '../utils';
 import { goHome } from './goHome';
-import { runElevator } from './runElevator';
+import { runElevatorForcibly } from './runElevatorForcibly';
 
 const ALL_TASK_NAMES = [
   'Баксы у инвесторов',
@@ -20,7 +20,7 @@ const ALL_TASK_NAMES = [
 ] as const;
 type TaskName = (typeof ALL_TASK_NAMES)[number];
 
-export const findVipTask = async (page: Page, username: string, taskNames: readonly TaskName[]) => {
+export const findVip = async (page: Page, username: string, taskNames: readonly TaskName[]) => {
   const activeVipTask = page.locator('img[src$="/glchest-open.png"]');
   if (await activeVipTask.isVisible()) {
     console.log(`✅ VIP-завдання вже активне`);
@@ -50,13 +50,7 @@ export const findVipTask = async (page: Page, username: string, taskNames: reado
   }
 
   const liftHomePage = page.locator('a.tdn[href*="lift"]');
-  const noVisitorsSelector = liftHomePage.locator('img[src$="/tb_lift2.png"]');
-  if (await noVisitorsSelector.isVisible()) {
-    await liftHomePage.click();
-    await page.getByRole('link', { name: 'Позвать посетителей' }).click();
-    await goHome(page);
-  }
-  await runElevator(page, username, {
+  await runElevatorForcibly(page, username, {
     evictWeakResidents: true,
     stopOnVIP: true,
   });
