@@ -1,8 +1,11 @@
-export { attendNegotiations } from './attendNegotiations';
-export { bring25Residents } from './bring25Residents';
-export { findVipTask } from './findVipTask';
 export { goHome } from './goHome';
 export { notifyAboutCollections } from './notifyAboutCollections';
 export { produceToys } from './produceToys';
+export { manageResidentsInHotel } from './manageResidentsInHotel';
+export { findVip } from './findVip';
 export { runElevator } from './runElevator';
+export { runElevatorForcibly } from './runElevatorForcibly';
+export { attendNegotiations } from './attendNegotiations';
 export { runManager } from './runManager';
+export { openChests } from './openChests';
+export { notifyAboutContracts } from './notifyAboutContracts';
