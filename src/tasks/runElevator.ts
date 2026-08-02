@@ -2,17 +2,15 @@ import type { Page } from 'playwright';
 import { ensureHotelHasFreePlace } from './ensureHotelHasFreePlace';
 import { goHome } from './goHome';
 
-export const runElevator = async (
-  page: Page,
-  username: string,
-  options: {
-    waitForMinimumVisitors?: number;
-    stopOnCitizen?: boolean;
-    evictWeakResidents?: boolean;
-    stopOnVIP?: boolean;
-    passOnlyBuyerVIP?: boolean;
-  },
-) => {
+export interface RunElevatorOptions {
+  waitForMinimumVisitors?: number;
+  stopOnCitizen?: boolean;
+  evictWeakResidents?: boolean;
+  stopOnVIP?: boolean;
+  passOnlyBuyerVIP?: boolean;
+}
+
+export const runElevator = async (page: Page, username: string, options: RunElevatorOptions) => {
   const liftHomePage = page.locator('a.tdn[href*="lift"]');
   const noVisitorsSelector = liftHomePage.locator('img[src$="/tb_lift2.png"]');
   if (await noVisitorsSelector.isVisible()) {
@@ -47,20 +45,20 @@ export const runElevator = async (
     const floorValue = floorTextContent ? Number(floorTextContent?.trim()) : null;
     if (await vip.isVisible()) {
       if (options.stopOnVIP) {
-        console.log(`✅ VIP для ${username} знайдений`);
+        console.log(`💎 VIP для ${username} знайдений`);
         await goHome(page);
         break;
       }
       if (options.passOnlyBuyerVIP) {
         if (await buyerIcon.isHidden()) {
-          console.log(`✅ Не VIP-покупець для ${username} знайдений`);
+          console.log(`💎 VIP Не VIP-покупець для ${username} знайдений`);
           await goHome(page);
           break;
         }
       }
     }
     if (floorValue === 1) {
-      console.log(`✅ Новий житель для ${username} знайдений`);
+      console.log(`👤 Новий житель для ${username} знайдений`);
       if (options.stopOnCitizen) {
         await goHome(page);
         break;
