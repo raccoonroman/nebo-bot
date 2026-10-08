@@ -23,7 +23,7 @@ type TaskName = (typeof ALL_TASK_NAMES)[number];
 export const findVip = async (page: Page, username: string, taskNames: readonly TaskName[]) => {
   const activeVipTask = page.locator('img[src$="/glchest-open.png"]');
   if (await activeVipTask.isVisible()) {
-    console.log(`✅ VIP-завдання вже активне`);
+    console.log(`✅ VIP-завдання вже активне в ${username}`);
     await goHome(page);
     return;
   }

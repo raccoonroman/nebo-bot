@@ -27,24 +27,30 @@ export const openChests = async (page: Page, username: string, options: OpenChes
     const isTaskDone = activeChestTask.locator('..').getByText('готово');
 
     if (await isTaskDone.isVisible()) {
-      console.log(`✅ Завдання "${taskName}" виконано для юзера ${username}`);
       await activeChestTask.click();
       await page.getByRole('link', { name: 'Завершить!' }).click();
+      console.log(`✅ Завдання "${taskName}" виконано для юзера ${username}`);
       await goHome(page);
-    } else {
-      if (!autoClosedTasks.includes(taskName ?? '')) {
-        if (options.difficultTask === 'cancel') {
+      return;
+    }
+
+    switch (options.difficultTask) {
+      case 'cancel': {
+        if (!autoClosedTasks.includes(taskName ?? '')) {
           await activeChestTask.click();
           await page.getByRole('link', { name: 'отменить' }).click();
           await page.getByRole('link', { name: 'Да, подтверждаю' }).click();
           console.log(`❌ Завдання "${taskName}" відмінено для юзера ${username}`);
           await goHome(page);
-        } else {
+        }
+        break;
+      }
+      case 'manual': {
+        if (!autoClosedTasks.includes(taskName ?? '')) {
           console.log(`⏳ Завдання "${taskName}" має бути виконано вручну для юзера ${username}`);
           playSound();
         }
-      } else {
-        console.log(`⏳ Завдання "${taskName}" ще не виконано для юзера ${username}`);
+        break;
       }
     }
   }
